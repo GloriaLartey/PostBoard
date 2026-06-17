@@ -1,6 +1,6 @@
 const { verifyAccessToken } = require("../utils/tokenUtils");
 const { errorResponse } = require("../utils/apiResponse");
-const User = require("../models/User");
+const User = require("../models/user");
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  protect – verifies JWT and attaches req.user
