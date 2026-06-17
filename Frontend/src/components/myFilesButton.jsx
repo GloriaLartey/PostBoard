@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FiHome, FiChevronRight, FiLoader } from "react-icons/fi";
 import { useSectionContents, useFolderContents } from "../hooks/useContent";
-import ContentGrid from "./ContentGrid";
+import ContentGrid from "./contentGrid";
 import { filterContents } from "../utils/contentFilter";
 
 export default function MyFilesButton({ viewMode, searchQuery = "" }) {
