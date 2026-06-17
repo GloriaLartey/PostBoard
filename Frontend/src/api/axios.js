@@ -5,7 +5,7 @@ const api = axios.create({
     import.meta.env.VITE_API_URL ||
     (import.meta.env.DEV
       ? "http://localhost:5000"
-      : "https://post-board-backend.vercel.app"),
+      : "https://postboard-9hyk.onrender.com/"),
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -75,10 +75,18 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const API_BASE_URL =
+          import.meta.env.VITE_API_URL ||
+          (import.meta.env.DEV
+            ? "http://localhost:5000"
+            : "https://postboard-9hyk.onrender.com");
+
         const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh-token`,
+          `${API_BASE_URL}/api/auth/refresh-token`,
           {},
-          { withCredentials: true },
+          {
+            withCredentials: true,
+          },
         );
 
         const newToken = data.data.accessToken;
