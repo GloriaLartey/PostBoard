@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Content = require("../models/content");
-const User = require("../models/User");
+const User = require("../models/user");
 const cloudinary = require("../config/cloudinary");
 const { successResponse, errorResponse } = require("../utils/apiResponse");
 const {
