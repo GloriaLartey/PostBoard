@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
 // ── Health Check Endpoint ─────────────────────────────────────────────────────
-app.get("/api/health", (req, res) => {
+app.get("/", (req, res) => {
   res.json({
     success: true,
     message: "PostBoard API is running 🚀",
