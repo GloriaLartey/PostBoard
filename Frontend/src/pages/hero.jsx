@@ -35,7 +35,7 @@ export default function Hero() {
       <div className="relative z-20 flex items-center justify-between px-6 md:px-12 py-6">
         <Logo />
 
-        {/* Show RightBarActions if logged in, else Login/Signup */}
+        {/* Logged in → Dashboard + bell + profile. Logged out → Login + Signup */}
         {user ? (
           <RightBarActions />
         ) : (
@@ -57,13 +57,15 @@ export default function Hero() {
             Efficiently sharing and receiving files, folders, messages and links
             on a secure platform.
           </p>
+
+          {/* CTA — Get Started when logged out, Go to Dashboard when logged in */}
           <div className="flex justify-center mt-8 w-full">
             <div className="p-[2px] rounded-full bg-gradient-to-r from-blue-600 via-pink-500 to-cyan-400 hover:scale-105 transition duration-300">
               {user ? (
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
-                  <FiLayout size={15} /> Go to Dashboard
+                  className="flex items-center gap-2 px-10 py-2 rounded-full bg-gray-900 text-white font-semibold">
+                  <FiLayout size={16} /> Go to Dashboard
                 </button>
               ) : (
                 <button

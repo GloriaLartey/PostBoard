@@ -86,16 +86,16 @@ function MediaPreview({ content }) {
   }
 
   // Fallback icon
-  const icons = {
-    folder: <FiFolder size={56} className="text-yellow-500" />,
-    message: <FiMessageSquare size={56} className="text-blue-500" />,
-    link: <FiLink size={56} className="text-purple-500" />,
-  };
-  return (
-    <div className="w-full bg-gray-50 rounded-2xl p-10 flex items-center justify-center">
-      {icons[type] || <FiFileText size={56} className="text-blue-400" />}
-    </div>
-  );
+  // const icons = {
+  //   folder: <FiFolder size={56} className="text-yellow-500" />,
+  //   message: <FiMessageSquare size={56} className="text-blue-500" />,
+  //   link: <FiLink size={56} className="text-purple-500" />,
+  // };
+  // return (
+  //   <div className="w-full bg-gray-50 rounded-2xl p-10 flex items-center justify-center">
+  //     {icons[type] || <FiFileText size={56} className="text-blue-400" />}
+  //   </div>
+  // );
 }
 
 // ── Edit panel ────────────────────────────────────────────────────────────────

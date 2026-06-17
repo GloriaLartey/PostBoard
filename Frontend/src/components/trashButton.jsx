@@ -20,6 +20,7 @@ import {
   useRestoreFromTrash,
   usePermanentDelete,
 } from "../hooks/useContent";
+import { filterContents } from "../utils/contentFilter";
 
 const FILES_PER_PAGE = 20;
 
@@ -132,11 +133,14 @@ function TrashRow({ file, onRestore, onDelete }) {
   );
 }
 
-export default function TrashButton() {
+export default function TrashButton({
+  viewMode: viewModeProp,
+  searchQuery = "",
+}) {
   const [folderStack, setFolderStack] = useState([]);
   const currentFolder = folderStack[folderStack.length - 1] ?? null;
 
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState(viewModeProp || "grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmId, setConfirmId] = useState(null);
 
@@ -144,7 +148,8 @@ export default function TrashButton() {
   const restoreMutation = useRestoreFromTrash();
   const deleteMutation = usePermanentDelete();
 
-  const files = data?.data?.contents || [];
+  const allFiles = data?.data?.contents || [];
+  const files = filterContents(allFiles, searchQuery);
   const slice = files.slice(
     (currentPage - 1) * FILES_PER_PAGE,
     currentPage * FILES_PER_PAGE,
@@ -167,6 +172,11 @@ export default function TrashButton() {
     }
   };
 
+  const navigateTo = (index) =>
+    setFolderStack((prev) => (index < 0 ? [] : prev.slice(0, index + 1)));
+  const handleFolderOpen = (folder) =>
+    setFolderStack((prev) => [...prev, { _id: folder._id, name: folder.name }]);
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-64">
@@ -183,7 +193,8 @@ export default function TrashButton() {
 
   return (
     <div>
-      <nav className="flex items-center gap-1 text-sm px-6 pt-6 flex-wrap">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1 text-sm flex-wrap">
         <button
           onClick={() => navigateTo(-1)}
           className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium transition">
@@ -194,21 +205,17 @@ export default function TrashButton() {
             <FiChevronRight size={14} className="text-gray-400" />
             <button
               onClick={() => navigateTo(i)}
-              className={`font-medium transition ${
-                i === folderStack.length - 1
-                  ? "text-gray-800 cursor-default"
-                  : "text-blue-600 hover:text-blue-800"
-              }`}>
+              className={`font-medium transition ${i === folderStack.length - 1 ? "text-gray-800 cursor-default" : "text-blue-600 hover:text-blue-800"}`}>
               {folder.name}
             </button>
           </span>
         ))}
       </nav>
-      <p className="flex items-center gap-1.5 text-gray-500 text-decoration-italic px-6">
+      <p className="text-gray-500 italic text-sm mb-1">
         Deleted items are automatically and permanently removed after 50 days
       </p>
       <div className="flex items-center justify-end mb-5">
-        {files.length > 0 && (
+        {allFiles.length > 0 && (
           <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-1">
             <button
               onClick={() => setViewMode("grid")}
@@ -227,9 +234,13 @@ export default function TrashButton() {
       {files.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64">
           <FiTrash2 size={48} className="text-gray-300 mb-4" />
-          <p className="text-gray-500 text-lg font-medium">Trash is empty</p>
+          <p className="text-gray-500 text-lg font-medium">
+            {searchQuery ? "No matches found" : "Trash is empty"}
+          </p>
           <p className="text-gray-400 text-sm mt-1">
-            Deleted items appear here for 50 days
+            {searchQuery
+              ? `Nothing matches "${searchQuery}"`
+              : "Deleted items appear here for 50 days"}
           </p>
         </div>
       )}

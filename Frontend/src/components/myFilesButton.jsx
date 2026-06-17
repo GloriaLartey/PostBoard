@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiHome, FiChevronRight, FiLoader } from "react-icons/fi";
 import { useSectionContents, useFolderContents } from "../hooks/useContent";
 import ContentGrid from "./ContentGrid";
+import { filterContents } from "../utils/contentFilter";
 
-export default function MyFilesButton() {
-  // Stack of { _id, name } — empty = root
+export default function MyFilesButton({ viewMode, searchQuery = "" }) {
   const [folderStack, setFolderStack] = useState([]);
   const currentFolder = folderStack[folderStack.length - 1] ?? null;
 
@@ -13,28 +13,24 @@ export default function MyFilesButton() {
     isLoading: sectionLoading,
     error: sectionError,
   } = useSectionContents("myfile");
-
   const {
     data: folderData,
     isLoading: folderLoading,
     error: folderError,
   } = useFolderContents(currentFolder?._id);
 
-  // Reset to page 1 when navigating
-  useEffect(() => {}, [currentFolder?._id]);
-
   const isLoading = currentFolder ? folderLoading : sectionLoading;
   const error = currentFolder ? folderError : sectionError;
 
-  // sectionData shape: { success, message, data: { contents, pagination } }
-  // folderData shape:  { success, message, data: { folder, contents } }
   const allFiles = currentFolder
     ? (folderData?.data?.contents ?? [])
     : (sectionData?.data?.contents ?? []);
 
+  // Filtered by the shared header search query
+  const visibleFiles = filterContents(allFiles, searchQuery);
+
   const navigateTo = (index) =>
     setFolderStack((prev) => (index < 0 ? [] : prev.slice(0, index + 1)));
-
   const handleFolderOpen = (folder) =>
     setFolderStack((prev) => [...prev, { _id: folder._id, name: folder.name }]);
 
@@ -50,7 +46,7 @@ export default function MyFilesButton() {
   return (
     <div>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm px-6 pt-6 flex-wrap">
+      <nav className="flex items-center gap-1 text-sm flex-wrap">
         <button
           onClick={() => navigateTo(-1)}
           className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium transition">
@@ -61,31 +57,33 @@ export default function MyFilesButton() {
             <FiChevronRight size={14} className="text-gray-400" />
             <button
               onClick={() => navigateTo(i)}
-              className={`font-medium transition ${
-                i === folderStack.length - 1
-                  ? "text-gray-800 cursor-default"
-                  : "text-blue-600 hover:text-blue-800"
-              }`}>
+              className={`font-medium transition ${i === folderStack.length - 1 ? "text-gray-800 cursor-default" : "text-blue-600 hover:text-blue-800"}`}>
               {folder.name}
             </button>
           </span>
         ))}
       </nav>
-      <p className="flex items-center gap-1.5 text-gray-500 text-decoration-italic px-6">
-        All files, folders, messages, and links you created or uploaded
+      <p className="items-center text-gray-500 italic text-sm mt-1 mb-4">
+        Your personal space to create or upload and manage your contents
       </p>
 
       <ContentGrid
-        files={allFiles}
+        files={visibleFiles}
         isLoading={false}
         error={error}
         emptyMessage={
-          currentFolder ? "This folder is empty" : "No contents yet"
+          searchQuery
+            ? "No matches found"
+            : currentFolder
+              ? "This folder is empty"
+              : "No contents yet"
         }
         emptySubMessage={
-          currentFolder
-            ? "Upload or create content here"
-            : "Start by uploading files or creating content"
+          searchQuery
+            ? `Nothing matches "${searchQuery}"`
+            : currentFolder
+              ? "Upload or create content here"
+              : "Start by uploading files or creating content"
         }
         showViewToggle
         onFolderOpen={handleFolderOpen}

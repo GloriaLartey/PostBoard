@@ -2,15 +2,13 @@ import api from "./axios";
 
 // ── Signup ────────────────────────────────────────────────────────────────────
 export const signup = async ({ username, email, password }) => {
-  const { data } = await api.post("api/auth/signup", {
-    username,
-    email,
-    password,
-  });
+  const { data } = await api.post("api/auth/signup", { username, email, password });
   return data;
 };
 
 // ── Verify OTP ────────────────────────────────────────────────────────────────
+// Only stores accessToken here. The `user` object itself is saved to context
+// (and pb_user) by the caller (useVerifyOTP), not here — single source of truth.
 export const verifyOTP = async ({ email, otp }) => {
   const { data } = await api.post("api/auth/verify-otp", { email, otp });
   if (data.data?.accessToken) {
@@ -26,6 +24,9 @@ export const resendOTP = async ({ email }) => {
 };
 
 // ── Login ─────────────────────────────────────────────────────────────────────
+// Same as above: only persist the access token here. pb_user is set by
+// AuthContext.saveUser via useLogin's onSuccess so context state and
+// localStorage never drift apart.
 export const login = async ({ identifier, password }) => {
   const { data } = await api.post("api/auth/login", { identifier, password });
   if (data.data?.accessToken) {
@@ -50,10 +51,7 @@ export const forgotPassword = async ({ email }) => {
 
 // ── Reset Password ────────────────────────────────────────────────────────────
 export const resetPassword = async ({ token, password }) => {
-  const { data } = await api.post("api/auth/reset-password", {
-    token,
-    password,
-  });
+  const { data } = await api.post("api/auth/reset-password", { token, password });
   return data;
 };
 

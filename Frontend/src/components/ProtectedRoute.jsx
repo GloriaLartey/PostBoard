@@ -1,25 +1,17 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/authContext";
 
 /**
  * Protected Route Component
- * Redirects to login if user is not authenticated
+ * Redirects to login if user is not authenticated.
+ *
+ * useAuth() here is the CONTEXT hook — it returns { user, saveUser, clearAuth },
+ * synced in-memory immediately on login/logout. It does not expose isLoading
+ * because there's no async fetch involved; the value is hydrated synchronously
+ * from localStorage when AuthProvider mounts.
  */
 export default function ProtectedRoute({ children }) {
-  const { data: user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="inline-block">
-            <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-          </div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" replace />;

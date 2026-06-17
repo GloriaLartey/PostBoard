@@ -9,13 +9,17 @@ import {
   forgotPassword,
   resetPassword,
 } from "../api/auth.api";
+import { useAuth as useAuthContext } from "../context/authContext";
 
 const AUTH_QUERY_KEY = ["auth", "me"];
 
 /**
- * Hook to get current authenticated user
+ * Hook to get current authenticated user via /api/auth/me.
+ * Renamed internally to avoid colliding with the context's useAuth —
+ * import this as `useAuthQuery` if you need the React Query version
+ * elsewhere; most components should just use useAuth from authContext.
  */
-export const useAuth = () => {
+export const useCurrentUserQuery = () => {
   return useQuery({
     queryKey: AUTH_QUERY_KEY,
     queryFn: getMe,
@@ -24,95 +28,79 @@ export const useAuth = () => {
   });
 };
 
-/**
- * Hook for signup mutation
- */
 export const useSignup = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: signup,
-    onSuccess: () => {
-      // Don't auto-fetch user after signup, they need to verify OTP first
-    },
-  });
+  return useMutation({ mutationFn: signup });
 };
 
 /**
- * Hook for OTP verification mutation
+ * Verifying OTP logs the user in immediately (backend returns accessToken + user).
+ * Must push that user into AuthContext so the whole app sees them as logged in.
  */
 export const useVerifyOTP = () => {
   const queryClient = useQueryClient();
+  const { saveUser } = useAuthContext();
   return useMutation({
     mutationFn: verifyOTP,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data?.data?.user) saveUser(data.data.user);
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     },
   });
 };
 
-/**
- * Hook for OTP resend mutation
- */
 export const useResendOTP = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: resendOTP,
-    onSuccess: () => {
-      // OTP resent successfully
-    },
-  });
+  return useMutation({ mutationFn: resendOTP });
 };
 
 /**
- * Hook for login mutation
+ * Login must push the returned user into AuthContext —
+ * this was previously missing, leaving context.user stuck at null
+ * even though the access token + API calls succeeded.
  */
 export const useLogin = () => {
   const queryClient = useQueryClient();
+  const { saveUser } = useAuthContext();
   return useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data?.data?.user) saveUser(data.data.user);
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     },
   });
 };
 
 /**
- * Hook for logout mutation
+ * Logout clears AuthContext immediately regardless of whether the
+ * server call succeeds — if the access token is already invalid/expired,
+ * the POST may 401, but the user still needs to be logged out locally.
  */
 export const useLogout = () => {
   const queryClient = useQueryClient();
+  const { clearAuth } = useAuthContext();
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      localStorage.removeItem("accessToken");
+      clearAuth();
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+      queryClient.clear();
+    },
+    onError: () => {
+      // Even if the server rejects (401/expired token), still log out locally
+      clearAuth();
       queryClient.clear();
     },
   });
 };
 
-/**
- * Hook for forgot password mutation
- */
 export const useForgotPassword = () => {
-  return useMutation({
-    mutationFn: forgotPassword,
-  });
+  return useMutation({ mutationFn: forgotPassword });
 };
 
-/**
- * Hook for reset password mutation
- */
 export const useResetPassword = () => {
-  return useMutation({
-    mutationFn: resetPassword,
-  });
+  return useMutation({ mutationFn: resetPassword });
 };
 
-/**
- * Check if user is authenticated
- */
 export const useIsAuthenticated = () => {
-  const { data: user, isLoading } = useAuth();
-  return { isAuthenticated: !!user, isLoading };
+  const { user } = useAuthContext();
+  return { isAuthenticated: !!user, isLoading: false };
 };
