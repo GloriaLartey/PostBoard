@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const PendingUser = require("../models/PendingUser");
+const PendingUser = require("../models/pendingUser");
 const { successResponse, errorResponse } = require("../utils/apiResponse");
 const {
   generateAccessToken,
