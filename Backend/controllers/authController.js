@@ -33,11 +33,11 @@ const setRefreshCookie = (res, token) => {
 //  Helper – build safe user payload to send to client
 // ─────────────────────────────────────────────────────────────────────────────
 const userPayload = (user) => ({
-  id:         user._id,
-  username:   user.username,
-  email:      user.email,
-  avatar:     user.avatar,
-  role:       user.role,
+  id: user._id,
+  username: user.username,
+  email: user.email,
+  avatar: user.avatar,
+  role: user.role,
   isVerified: user.isVerified,
 });
 
@@ -54,7 +54,11 @@ exports.signup = async (req, res) => {
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       if (existingUser.email === email) {
-        return errorResponse(res, "An account with this email already exists.", 409);
+        return errorResponse(
+          res,
+          "An account with this email already exists.",
+          409,
+        );
       }
       return errorResponse(res, "This username is already taken.", 409);
     }
@@ -71,11 +75,11 @@ exports.signup = async (req, res) => {
         return errorResponse(res, "This username is already taken.", 409);
       }
 
-      const otp        = generateOTP();
-      const expiresAt  = otpExpiresAt();
+      const otp = generateOTP();
+      const expiresAt = otpExpiresAt();
       const otpMinutes = Number(process.env.OTP_EXPIRES_IN) || 10;
 
-      existingPending.otp      = { code: otp, expiresAt, attempts: 0 };
+      existingPending.otp = { code: otp, expiresAt, attempts: 0 };
       existingPending.expiresAt = new Date(Date.now() + otpMinutes * 60 * 1000);
       await existingPending.save();
 
@@ -90,7 +94,7 @@ exports.signup = async (req, res) => {
         res,
         "A new verification code has been sent to your email.",
         { email },
-        200
+        200,
       );
     }
 
@@ -101,13 +105,13 @@ exports.signup = async (req, res) => {
     }
 
     // 4. Hash the password before storing in PendingUser
-    const salt           = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // 5. Generate OTP and compute expiry
-    const otp        = generateOTP();
+    const otp = generateOTP();
     const otpMinutes = Number(process.env.OTP_EXPIRES_IN) || 10;
-    const expiresAt  = new Date(Date.now() + otpMinutes * 60 * 1000);
+    const expiresAt = new Date(Date.now() + otpMinutes * 60 * 1000);
 
     // 6. Store in PendingUser (auto-deleted by TTL if never verified)
     await PendingUser.create({
@@ -119,13 +123,18 @@ exports.signup = async (req, res) => {
     });
 
     // 7. Send OTP — account only becomes real after this is confirmed
-    await sendOTPEmail({ to: email, username, otp, expiresInMinutes: otpMinutes });
+    await sendOTPEmail({
+      to: email,
+      username,
+      otp,
+      expiresInMinutes: otpMinutes,
+    });
 
     return successResponse(
       res,
       "A verification code has been sent to your email. Please enter it to complete your registration.",
       { email },
-      201
+      201,
     );
   } catch (error) {
     console.error("signup error:", error);
@@ -147,7 +156,7 @@ exports.verifyOTP = async (req, res) => {
       return errorResponse(
         res,
         "No pending registration found for this email. Please sign up first.",
-        404
+        404,
       );
     }
 
@@ -159,7 +168,7 @@ exports.verifyOTP = async (req, res) => {
       return errorResponse(
         res,
         "Too many incorrect attempts. Your registration has been cancelled. Please sign up again.",
-        429
+        429,
       );
     }
 
@@ -169,7 +178,7 @@ exports.verifyOTP = async (req, res) => {
       return errorResponse(
         res,
         "Your verification code has expired. Please sign up again.",
-        400
+        400,
       );
     }
 
@@ -181,24 +190,24 @@ exports.verifyOTP = async (req, res) => {
       return errorResponse(
         res,
         `Incorrect code. ${remaining} attempt${remaining !== 1 ? "s" : ""} remaining.`,
-        400
+        400,
       );
     }
 
     // ✅ OTP correct — create the real User now
     // Flag tells the pre-save hook not to re-hash the already-hashed password
-    const user        = new User({
-      username:   pending.username,
-      email:      pending.email,
-      password:   pending.password, // already hashed in signup
+    const user = new User({
+      username: pending.username,
+      email: pending.email,
+      password: pending.password, // already hashed in signup
       isVerified: true,
     });
     // Issue tokens — user is logged in immediately after verification
-    const accessToken  = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
     user.refreshTokens = [refreshToken];
-    user.lastLoginAt   = new Date();
+    user.lastLoginAt = new Date();
     await user.save(); // single save — flag prevents double-hashing
 
     // Remove the pending record
@@ -210,11 +219,15 @@ exports.verifyOTP = async (req, res) => {
       res,
       "Email verified! Welcome to PostBoard.",
       { accessToken, user: userPayload(user) },
-      201
+      201,
     );
   } catch (error) {
     console.error("verifyOTP error:", error);
-    return errorResponse(res, "An error occurred during OTP verification.", 500);
+    return errorResponse(
+      res,
+      "An error occurred during OTP verification.",
+      500,
+    );
   }
 };
 
@@ -231,15 +244,15 @@ exports.resendOTP = async (req, res) => {
       return errorResponse(
         res,
         "No pending registration found for this email. Please sign up first.",
-        404
+        404,
       );
     }
 
-    const otp        = generateOTP();
+    const otp = generateOTP();
     const otpMinutes = Number(process.env.OTP_EXPIRES_IN) || 10;
-    const expiresAt  = new Date(Date.now() + otpMinutes * 60 * 1000);
+    const expiresAt = new Date(Date.now() + otpMinutes * 60 * 1000);
 
-    pending.otp      = { code: otp, expiresAt, attempts: 0 };
+    pending.otp = { code: otp, expiresAt, attempts: 0 };
     pending.expiresAt = expiresAt;
     await pending.save();
 
@@ -253,7 +266,7 @@ exports.resendOTP = async (req, res) => {
     return successResponse(
       res,
       "A new verification code has been sent to your email.",
-      { email }
+      { email },
     );
   } catch (error) {
     console.error("resendOTP error:", error);
@@ -266,15 +279,21 @@ exports.resendOTP = async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 exports.login = async (req, res) => {
   try {
+    console.log("----------------------------------------------------");
+    console.log(
+      "--------------------------- signin starting --------------------------",
+    );
+
     const { identifier, password } = req.body;
 
     const isEmail = identifier.includes("@");
-    const query   = isEmail ? { email: identifier } : { username: identifier };
-    const user    = await User.findOne(query).select("+password +refreshTokens");
+    const query = isEmail ? { email: identifier } : { username: identifier };
+    const user = await User.findOne(query).select("+password +refreshTokens");
 
-    const invalidMsg = "Invalid credentials. Please check your details and try again.";
+    const invalidMsg =
+      "Invalid credentials. Please check your details and try again.";
     if (!user) {
-        return errorResponse(res, invalidMsg, 401);
+      return errorResponse(res, invalidMsg, 401);
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
@@ -284,16 +303,23 @@ exports.login = async (req, res) => {
       return errorResponse(
         res,
         "Your account has been deactivated. Please contact your administrator.",
-        403
+        403,
       );
     }
 
     // Issue tokens
-    const accessToken  = generateAccessToken(user._id);
+    const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    user.refreshTokens = [...(user.refreshTokens || []), refreshToken].slice(-5);
-    user.lastLoginAt   = new Date();
+    console.log(
+      "--------------------------------------------------------------------",
+    );
+    console.log(refreshToken);
+
+    user.refreshTokens = [...(user.refreshTokens || []), refreshToken].slice(
+      -5,
+    );
+    user.lastLoginAt = new Date();
     await user.save({ validateBeforeSave: false });
 
     setRefreshCookie(res, refreshToken);
@@ -329,10 +355,14 @@ exports.refreshToken = async (req, res) => {
         user.refreshTokens = [];
         await user.save({ validateBeforeSave: false });
       }
-      return errorResponse(res, "Refresh token is no longer valid. Please log in again.", 401);
+      return errorResponse(
+        res,
+        "Refresh token is no longer valid. Please log in again.",
+        401,
+      );
     }
 
-    const newAccessToken  = generateAccessToken(user._id);
+    const newAccessToken = generateAccessToken(user._id);
     const newRefreshToken = generateRefreshToken(user._id);
 
     user.refreshTokens = user.refreshTokens
@@ -343,7 +373,9 @@ exports.refreshToken = async (req, res) => {
     await user.save({ validateBeforeSave: false });
     setRefreshCookie(res, newRefreshToken);
 
-    return successResponse(res, "Token refreshed.", { accessToken: newAccessToken });
+    return successResponse(res, "Token refreshed.", {
+      accessToken: newAccessToken,
+    });
   } catch (error) {
     console.error("refreshToken error:", error);
     return errorResponse(res, "Token refresh failed.", 500);
@@ -360,7 +392,9 @@ exports.logout = async (req, res) => {
     if (token) {
       const user = await User.findById(req.user?._id).select("+refreshTokens");
       if (user) {
-        user.refreshTokens = (user.refreshTokens || []).filter((t) => t !== token);
+        user.refreshTokens = (user.refreshTokens || []).filter(
+          (t) => t !== token,
+        );
         await user.save({ validateBeforeSave: false });
       }
     }
@@ -384,10 +418,11 @@ exports.logout = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user      = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     // Always return the same message to prevent email enumeration
-    const genericMsg = "If an account with that email exists, a password reset link has been sent.";
+    const genericMsg =
+      "If an account with that email exists, a password reset link has been sent.";
 
     if (!user || !user.isActive) return successResponse(res, genericMsg);
 
@@ -421,8 +456,8 @@ exports.resetPassword = async (req, res) => {
     const { token, password } = req.body;
 
     const hashedToken = hashResetToken(token);
-    const user        = await User.findOne({
-      passwordResetToken:     hashedToken,
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
       passwordResetExpiresAt: { $gt: new Date() },
     }).select("+password");
 
@@ -430,17 +465,17 @@ exports.resetPassword = async (req, res) => {
       return errorResponse(
         res,
         "This password reset link is invalid or has expired. Please request a new one.",
-        400
+        400,
       );
     }
 
     // Hash the new password before saving
     const salt = await bcrypt.genSalt(12);
-    user.password               = await bcrypt.hash(password, salt);
-    user.passwordChangedAt      = new Date(Date.now() - 1000);
-    user.passwordResetToken     = undefined;
+    user.password = await bcrypt.hash(password, salt);
+    user.passwordChangedAt = new Date(Date.now() - 1000);
+    user.passwordResetToken = undefined;
     user.passwordResetExpiresAt = undefined;
-    user.refreshTokens          = []; // invalidate all sessions
+    user.refreshTokens = []; // invalidate all sessions
 
     await user.save();
 
@@ -452,7 +487,7 @@ exports.resetPassword = async (req, res) => {
 
     return successResponse(
       res,
-      "Password reset successful! Please log in with your new password."
+      "Password reset successful! Please log in with your new password.",
     );
   } catch (error) {
     console.error("resetPassword error:", error);
@@ -483,12 +518,17 @@ exports.validateResetToken = async (req, res) => {
     if (!token) return errorResponse(res, "Token is required.", 400);
 
     const hashedToken = hashResetToken(token);
-    const user        = await User.findOne({
-      passwordResetToken:     hashedToken,
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
       passwordResetExpiresAt: { $gt: new Date() },
     });
 
-    if (!user) return errorResponse(res, "This reset link is invalid or has expired.", 400);
+    if (!user)
+      return errorResponse(
+        res,
+        "This reset link is invalid or has expired.",
+        400,
+      );
 
     return successResponse(res, "Token is valid.", { valid: true });
   } catch (error) {

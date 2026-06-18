@@ -1,15 +1,20 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV
-      ? "http://localhost:5000"
-      : "https://gpostboard.adroit360.com"),
-  withCredentials: true,
+  baseURL: "http://localhost:5000",
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", // Sent with all requests
+    Accept: "application/json",
   },
+  // baseURL:
+  //   import.meta.env.VITE_API_URL ||
+  //   (import.meta.env.DEV === true
+  //     ? "http://localhost:5000"
+  //     : "https://gpostboard.adroit360.com"),
+  // withCredentials: true,
+  // headers: {
+  //   "Content-Type": "application/json",
+  // },
 });
 
 // ── Request interceptor: attach access token ──────────────────────────────────
@@ -42,9 +47,23 @@ const processQueue = (error, token = null) => {
 };
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(
+      "----------------------------------- response ----------------------------------",
+    );
+    console.log({ response });
+
+    return response;
+  },
   async (error) => {
+    console.log(
+      "--------------------------------------- interceptor ---------------------------------------",
+    );
+    console.log({ error });
+
     const originalRequest = error.config;
+
+    console.log("---------------------------------- check 1");
 
     // Don't retry refresh token requests
     const skipRefresh = [
@@ -76,7 +95,7 @@ api.interceptors.response.use(
       try {
         const API_BASE_URL =
           import.meta.env.VITE_API_URL ||
-          (import.meta.env.DEV
+          (import.meta.env.DEV === true
             ? "http://localhost:5000"
             : "https://gpostboard.adroit360.com");
 

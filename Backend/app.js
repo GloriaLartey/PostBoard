@@ -15,6 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // ── Logging ───────────────────────────────────────────────────────────────────
 // const morganFormat =
@@ -33,7 +34,6 @@ app.use(helmet());
 
 // Handle preflight for all routes
 // app.options("*", cors());
-app.use(cors());
 
 // app.use(
 //   cors({

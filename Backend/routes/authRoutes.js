@@ -16,7 +16,10 @@ const {
 
 const { protect } = require("../middleware/authMiddleware");
 const validate = require("../middleware/validate");
-const { authLimiter, sensitiveAuthLimiter } = require("../middleware/rateLimiter");
+const {
+  authLimiter,
+  sensitiveAuthLimiter,
+} = require("../middleware/rateLimiter");
 
 const {
   signupValidation,
@@ -29,20 +32,47 @@ const {
 
 // ── Public routes ─────────────────────────────────────────────────────────────
 
+// router.post("/login", login);
+
 // Registration
 router.post("/signup", authLimiter, signupValidation, validate, signup);
 
 // OTP
-router.post("/verify-otp", authLimiter, verifyOTPValidation, validate, verifyOTP);
-router.post("/resend-otp", sensitiveAuthLimiter, resendOTPValidation, validate, resendOTP);
+router.post(
+  "/verify-otp",
+  authLimiter,
+  verifyOTPValidation,
+  validate,
+  verifyOTP,
+);
+router.post(
+  "/resend-otp",
+  sensitiveAuthLimiter,
+  resendOTPValidation,
+  validate,
+  resendOTP,
+);
 
 // Login / token management
 router.post("/login", authLimiter, loginValidation, validate, login);
+
 router.post("/refresh-token", authLimiter, refreshToken);
 
 // Password recovery
-router.post("/forgot-password", sensitiveAuthLimiter, forgotPasswordValidation, validate, forgotPassword);
-router.post("/reset-password", authLimiter, resetPasswordValidation, validate, resetPassword);
+router.post(
+  "/forgot-password",
+  sensitiveAuthLimiter,
+  forgotPasswordValidation,
+  validate,
+  forgotPassword,
+);
+router.post(
+  "/reset-password",
+  authLimiter,
+  resetPasswordValidation,
+  validate,
+  resetPassword,
+);
 
 // Validate reset token before rendering the reset-password page (frontend ping)
 router.get("/validate-reset-token", validateResetToken);
