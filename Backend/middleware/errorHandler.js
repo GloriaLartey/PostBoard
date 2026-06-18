@@ -35,8 +35,8 @@ const errorHandler = (err, req, res, next) => {
       field === "email"
         ? "An account with this email already exists."
         : field === "username"
-        ? "This username is already taken."
-        : `Duplicate value for field: ${field}`;
+          ? "This username is already taken."
+          : `Duplicate value for field: ${field}`;
     return errorResponse(res, message, 409);
   }
 
@@ -51,7 +51,11 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.name === "TokenExpiredError") {
-    return errorResponse(res, "Your session has expired. Please log in again.", 401);
+    return errorResponse(
+      res,
+      "Your session has expired. Please log in again.",
+      401,
+    );
   }
 
   // Multer errors (file upload)
@@ -87,7 +91,7 @@ const notFound = (req, res) => {
   return errorResponse(
     res,
     `Route not found: ${req.method} ${req.originalUrl}`,
-    404
+    404,
   );
 };
 
