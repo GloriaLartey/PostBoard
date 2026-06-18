@@ -50,15 +50,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
-// app.use(express.json({ limit: "10mb" }));
-// app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // ── Health Check Endpoint ─────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "PostBoard API is running 🚀",
+    message: "PostBoard API is running",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
