@@ -22,9 +22,9 @@ app.use(helmet());
 
 // ── CORS Configuration ────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  process.env.VITE_CLIENT_URL,
   "http://localhost:5173",
-  "http://localhost:3000",
+  "https://post-board-frontend.vercel.app",
 ].filter(Boolean);
 
 // Handle preflight for all routes
@@ -42,9 +42,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Set-Cookie"],
-  })
+  }),
 );
-
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
 app.use(express.json());
