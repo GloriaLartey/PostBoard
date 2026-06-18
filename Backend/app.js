@@ -21,33 +21,35 @@ app.use(morgan(morganFormat));
 app.use(helmet());
 
 // ── CORS Configuration ────────────────────────────────────────────────────────
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://post-board-frontend.vercel.app",
-];
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://post-board-frontend.vercel.app",
+// ];
 
-if (process.env.VITE_CLIENT_URL) {
-  allowedOrigins.push(process.env.VITE_CLIENT_URL);
-}
+// if (process.env.VITE_CLIENT_URL) {
+//   allowedOrigins.push(process.env.VITE_CLIENT_URL);
+// }
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no origin (Postman, mobile apps, server-to-server)
-    if (!origin) return callback(null, true);
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     // Allow requests with no origin (Postman, mobile apps, server-to-server)
+//     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
 
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
-};
+//     return callback(new Error("Not allowed by CORS"));
+//   },
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   optionsSuccessStatus: 200,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+
+app.use(cors());
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
 app.use(express.json());
