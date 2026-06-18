@@ -3,51 +3,54 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const contentRoutes = require("./routes/contentRoutes");
 const userRoutes = require("./routes/userRoutes");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 
+require("dotenv").config();
+
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // ── Logging ───────────────────────────────────────────────────────────────────
-const morganFormat =
-  process.env.NODE_ENV === "development" ? "dev" : "combined";
-app.use(morgan(morganFormat));
+// const morganFormat =
+//   process.env.NODE_ENV === "development" ? "dev" : "combined";
+app.use(morgan("dev"));
 
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet());
 
 // ── CORS Configuration ────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.VITE_CLIENT_URL,
-  "http://localhost:5173",
-  "https://post-board-frontend.vercel.app",
-].filter(Boolean);
+// const allowedOrigins = [
+//   process.env.VITE_CLIENT_URL,
+//   "http://localhost:5173",
+//   "https://post-board-frontend.vercel.app",
+// ].filter(Boolean);
 
 // Handle preflight for all routes
-app.options("*", cors());
+// app.options("*", cors());
+app.use(cors());
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, server-to-server)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, origin);
-      callback(new Error(`CORS blocked: ${origin}`));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Set-Cookie"],
-  }),
-);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       // Allow requests with no origin (Postman, curl, server-to-server)
+//       if (!origin) return callback(null, true);
+//       if (allowedOrigins.includes(origin)) return callback(null, origin);
+//       callback(new Error(`CORS blocked: ${origin}`));
+//     },
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     exposedHeaders: ["Set-Cookie"],
+//   }),
+// );
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // ── Health Check Endpoint ─────────────────────────────────────────────────────
