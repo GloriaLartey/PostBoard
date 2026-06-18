@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
 
-const DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || "gmail.com";
+const DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || "@";
 
 // ── Signup ────────────────────────────────────────────────────────────────────
 const signupValidation = [
@@ -12,7 +12,7 @@ const signupValidation = [
     .withMessage("Username must be between 3 and 30 characters")
     .matches(/^[a-zA-Z0-9_.-]+$/)
     .withMessage(
-      "Username can only contain letters, numbers, underscores, hyphens and dots"
+      "Username can only contain letters, numbers, underscores, hyphens and dots",
     ),
 
   body("email")
@@ -43,7 +43,6 @@ const signupValidation = [
     .withMessage("Password must contain at least one number")
     .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/)
     .withMessage("Password must contain at least one special character"),
-
 ];
 
 // ── OTP Verification ──────────────────────────────────────────────────────────
@@ -122,7 +121,6 @@ const resetPasswordValidation = [
     .withMessage("Password must contain at least one number")
     .matches(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/)
     .withMessage("Password must contain at least one special character"),
-
 ];
 
 module.exports = {

@@ -98,9 +98,8 @@ const sendDecodeKeyEmail = async ({ to, recipientUsername, senderUsername, conte
   const html = emailWrapper(
     "You have a coded content to unlock",
     `
-    <h2>Coded Content Shared With You</h2>
-    <p>Hi <strong>${recipientUsername}</strong>,</p>
-    <p><strong>${senderUsername}</strong> shared a coded content with you on PostBoard.</p>
+    <h2>Decode Key for Coded Content</h2>
+    <p>Hi <strong>${senderUsername}</strong>,</p>
     <p>Content: <strong>${contentName}</strong></p>
     <p>Use the key below to unlock and access it:</p>
     <div style="text-align:center;">
