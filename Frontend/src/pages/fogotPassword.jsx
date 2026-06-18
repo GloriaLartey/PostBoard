@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-4">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center px-3 sm:px-4 md:px-6">
 
       {/* Background */}
       <div
@@ -52,7 +52,21 @@ export default function ForgotPasswordPage() {
       <div className="absolute inset-0 bg-white/50 backdrop-blur-sm" />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-md bg-white/85 backdrop-blur-xl border border-white/40 rounded-3xl p-6 shadow-2xl">
+      <div
+        className="
+          relative z-10
+          w-full
+          max-w-[92vw]
+          sm:max-w-sm
+          md:max-w-md
+          bg-white/85
+          backdrop-blur-xl
+          border border-white/40
+          rounded-2xl md:rounded-3xl
+          p-4 sm:p-5 md:p-6
+          shadow-2xl
+        "
+      >
 
         {/* Logo */}
         <div className="flex justify-center mb-4">
@@ -60,26 +74,39 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-blue-600 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
+        <h1
+          className="
+            text-xl sm:text-2xl
+            font-bold
+            text-center
+            text-blue-600
+            bg-gradient-to-r
+            from-blue-600
+            via-pink-500
+            to-cyan-400
+            bg-clip-text
+            text-transparent
+          "
+        >
           Forgot Password
         </h1>
 
-        <p className="text-center text-gray-500 mt-2 text-sm">
+        <p className="text-center text-black md:text-gray-500 mt-2 text-xs sm:text-sm">
           Enter your email address and we'll send you a password reset link.
         </p>
 
         {/* Error */}
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
+          <div className="mt-4 p-3 rounded-xl bg-red-100 border border-red-300 text-red-700 text-sm">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-black md:text-gray-700 mb-2">
               Email Address
             </label>
 
@@ -88,7 +115,17 @@ export default function ForgotPasswordPage() {
               value={email}
               placeholder="Enter your email"
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="
+                w-full
+                px-3 md:px-4
+                py-2.5 md:py-3
+                border border-gray-300
+                rounded-xl
+                text-sm
+                focus:outline-none
+                focus:ring-2
+                focus:ring-blue-500
+              "
               required
             />
           </div>
@@ -96,14 +133,27 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={forgotPasswordMutation.isPending}
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-50"
+            className="
+              w-full
+              py-2.5 md:py-3
+              rounded-xl
+              bg-blue-600
+              bg-gradient-to-r
+              from-blue-600
+              to-cyan-400
+              text-white
+              text-sm md:text-base
+              font-semibold
+              hover:opacity-90
+              disabled:opacity-50
+            "
           >
             {forgotPasswordMutation.isPending
               ? "Sending..."
               : "Send Reset Link"}
           </button>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-black md:text-gray-500">
             Remember your password?{" "}
             <Link
               to="/login"
@@ -118,39 +168,62 @@ export default function ForgotPasswordPage() {
 
       {/* Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
 
-          <div className="relative bg-white rounded-3xl p-8 w-[90%] max-w-md text-center shadow-2xl">
+          <div
+            className="
+              relative
+              bg-white
+              rounded-2xl md:rounded-3xl
+              p-5 md:p-8
+              w-[92%]
+              max-w-md
+              text-center
+              shadow-2xl
+            "
+          >
 
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
             >
-              <FiX size={22} />
+              <FiX size={20} />
             </button>
 
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-green-100 flex items-center justify-center">
                 <FiMail
-                  size={28}
+                  size={24}
                   className="text-green-600"
                 />
               </div>
             </div>
 
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
+            <h2
+              className="
+                text-xl sm:text-2xl
+                font-bold
+                text-blue-600
+                bg-gradient-to-r
+                from-blue-600
+                via-pink-500
+                to-cyan-400
+                bg-clip-text
+                text-transparent
+              "
+            >
               Reset Link Sent
             </h2>
 
-            <p className="text-gray-600 mt-4 text-sm">
+            <p className="text-black md:text-gray-600 mt-4 text-sm">
               If an account exists for
             </p>
 
-            <p className="font-medium text-gray-800 break-all mt-1">
+            <p className="font-medium text-black break-all mt-1 text-sm">
               {submittedEmail}
             </p>
 
-            <p className="text-gray-500 mt-4 text-sm">
+            <p className="text-black md:text-gray-500 mt-4 text-sm">
               A password reset link has been sent to the email address above.
             </p>
 
@@ -160,7 +233,18 @@ export default function ForgotPasswordPage() {
 
             <button
               onClick={() => setShowModal(false)}
-              className="mt-6 px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-400 text-white font-medium"
+              className="
+                mt-6
+                px-5 py-2.5
+                rounded-xl
+                bg-blue-600
+                bg-gradient-to-r
+                from-blue-600
+                to-cyan-400
+                text-white
+                text-sm md:text-base
+                font-medium
+              "
             >
               Close
             </button>
@@ -170,7 +254,15 @@ export default function ForgotPasswordPage() {
       )}
 
       {/* Help */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div
+        className="
+          fixed
+          bottom-4 md:bottom-6
+          right-4 md:right-6
+          z-50
+          scale-90 md:scale-100
+        "
+      >
         <Help />
       </div>
 

@@ -16,13 +16,15 @@ export default function Login() {
         transition-all
         duration-300
         hover:rounded-full
+        hover:scale-105
       "
     >
       <div
         className="
           bg-white
-          px-6
-          py-2
+          px-4 sm:px-5 md:px-6
+          py-1.5 sm:py-2
+          text-sm sm:text-base
           font-semibold
           text-center
           transition-all

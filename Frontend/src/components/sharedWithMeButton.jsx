@@ -18,8 +18,10 @@ import {
 import { useSectionContents } from "../hooks/useContent";
 import ThreeDotsMenu from "./threeDotsMenu";
 import Open from "./open";
+import { filterContents } from "../utils/contentFilter";
 
 const PER_PAGE = 12;
+
 const TYPE_COLORS = {
   folder: { bg: "bg-yellow-50", text: "text-yellow-500" },
   image: { bg: "bg-pink-50", text: "text-pink-500" },
@@ -29,6 +31,7 @@ const TYPE_COLORS = {
   message: { bg: "bg-blue-50", text: "text-blue-500" },
   link: { bg: "bg-purple-50", text: "text-purple-500" },
 };
+
 const colorFor = (t) =>
   TYPE_COLORS[t] || { bg: "bg-indigo-50", text: "text-indigo-500" };
 
@@ -53,11 +56,13 @@ function getIcon(type, size = 36) {
       return <FiFileText {...p} />;
   }
 }
+
 function fmt(b) {
   if (!b) return null;
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
   return `${(b / 1024 / 1024).toFixed(2)} MB`;
 }
+
 function sortStar(files, starred) {
   return [...files].sort(
     (a, b) => (starred[b._id] ? 1 : 0) - (starred[a._id] ? 1 : 0),
@@ -178,7 +183,7 @@ function SharedRow({ file, starred, onStar, onOpen }) {
   );
 }
 
-export default function SharedWithMeButton() {
+export default function SharedWithMeButton({ searchQuery = "" }) {
   const [folderStack, setFolderStack] = useState([]);
   const currentFolder = folderStack[folderStack.length - 1] ?? null;
 
@@ -189,7 +194,9 @@ export default function SharedWithMeButton() {
   const [showOpen, setShowOpen] = useState(false);
 
   const { data, isLoading, error } = useSectionContents("shared-with-me");
-  const files = data?.data?.contents || [];
+
+  const allFiles = data?.data?.contents || [];
+  const files = filterContents(allFiles, searchQuery);
   const sorted = sortStar(files, starred);
   const slice = sorted.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const maxPage = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
@@ -198,6 +205,9 @@ export default function SharedWithMeButton() {
     setOpenContent(c);
     setShowOpen(true);
   };
+
+  const navigateTo = (index) =>
+    setFolderStack((prev) => (index < 0 ? [] : prev.slice(0, index + 1)));
 
   if (isLoading)
     return (
@@ -223,7 +233,7 @@ export default function SharedWithMeButton() {
         </button>
         {folderStack.map((folder, i) => (
           <span key={folder._id} className="flex items-center gap-1">
-            <FiChevronRight size={14} className="text-gray-400" />
+            <span className="text-gray-400">›</span>
             <button
               onClick={() => navigateTo(i)}
               className={`font-medium transition ${
@@ -240,7 +250,7 @@ export default function SharedWithMeButton() {
         All contents that have been shared with you
       </p>
       <div className="flex items-center justify-between mb-5">
-        {files.length > 0 && (
+        {allFiles.length > 0 && (
           <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-1">
             <button
               onClick={() => setViewMode("grid")}
@@ -260,10 +270,12 @@ export default function SharedWithMeButton() {
         <div className="flex flex-col items-center justify-center h-64">
           <FiUsers size={48} className="text-gray-300 mb-4" />
           <p className="text-gray-500 text-lg font-medium">
-            Nothing shared with you yet
+            {searchQuery ? "No matches found" : "Nothing shared with you yet"}
           </p>
           <p className="text-gray-400 text-sm mt-1">
-            Content shared by others will appear here
+            {searchQuery
+              ? `Nothing matches "${searchQuery}"`
+              : "Content shared by others will appear here"}
           </p>
         </div>
       )}

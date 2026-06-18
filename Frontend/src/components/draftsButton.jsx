@@ -24,6 +24,7 @@ import {
   useMoveToTrash,
 } from "../hooks/useContent";
 // import ThreeDotsMenu from "./threeDotsMenu";
+import { filterContents } from "../utils/contentFilter";
 
 const FILES_PER_PAGE = 12;
 
@@ -292,7 +293,7 @@ function ContinueModal({ draft, onClose, onSaved, onDiscarded }) {
   );
 }
 
-export default function DraftsButton() {
+export default function DraftsButton({ searchQuery = "" }) {
   const [folderStack, setFolderStack] = useState([]);
   const currentFolder = folderStack[folderStack.length - 1] ?? null;
 
@@ -304,7 +305,8 @@ export default function DraftsButton() {
   const { data: sectionData, isLoading, error } = useSectionContents("draft");
   const trashMutation = useMoveToTrash();
 
-  const files = sectionData?.data?.contents || [];
+  const allFiles = sectionData?.data?.contents ?? [];
+  const files = filterContents(allFiles, searchQuery);
   const sorted = sortStarredFirst(files, starred);
   const startIndex = (currentPage - 1) * FILES_PER_PAGE;
   const currentFiles = sorted.slice(startIndex, startIndex + FILES_PER_PAGE);
@@ -379,9 +381,13 @@ export default function DraftsButton() {
       {files.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64">
           <FiClock size={48} className="text-gray-300 mb-4" />
-          <p className="text-gray-500 text-lg font-medium">No drafts yet</p>
+          <p className="text-gray-500 text-lg font-medium">
+            {searchQuery ? "No matches found" : "No drafts yet"}
+          </p>
           <p className="text-gray-400 text-sm mt-1">
-            Drafts will appear here when you save without finishing
+            {searchQuery
+              ? `Nothing matches "${searchQuery}"`
+              : "Drafts will appear here when you save without finishing"}
           </p>
         </div>
       )}

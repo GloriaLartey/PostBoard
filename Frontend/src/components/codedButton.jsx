@@ -25,8 +25,10 @@ import {
 } from "../hooks/useContent";
 import ThreeDotsMenu from "./threeDotsMenu";
 import Open from "./open";
+import { filterContents } from "../utils/contentFilter";
 
 const PER_PAGE = 15;
+
 function getIcon(type, size = 36) {
   const p = { size };
   switch (type) {
@@ -48,11 +50,13 @@ function getIcon(type, size = 36) {
       return <FiFileText {...p} />;
   }
 }
+
 function fmt(b) {
   if (!b) return null;
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
   return `${(b / 1024 / 1024).toFixed(2)} MB`;
 }
+
 function sortStar(files, starred) {
   return [...files].sort(
     (a, b) => (starred[b._id] ? 1 : 0) - (starred[a._id] ? 1 : 0),
@@ -208,7 +212,7 @@ function CodedRow({
   );
 }
 
-export default function CodedButton() {
+export default function CodedButton({ searchQuery = "" }) {
   const [folderStack, setFolderStack] = useState([]);
   const currentFolder = folderStack[folderStack.length - 1] ?? null;
 
@@ -226,7 +230,8 @@ export default function CodedButton() {
   const decodeMutation = useDecodeContent();
   const trashMutation = useMoveToTrash();
 
-  const files = data?.data?.contents || [];
+  const allFiles = data?.data?.contents || [];
+  const files = filterContents(allFiles, searchQuery);
   const sorted = sortStar(files, starred);
   const slice = sorted.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const maxPage = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
@@ -257,6 +262,7 @@ export default function CodedButton() {
     setOpenContent(decodedFiles[file._id] || file);
     setShowOpen(true);
   };
+
   const handleDelete = async (id) => {
     try {
       await trashMutation.mutateAsync(id);
@@ -264,6 +270,9 @@ export default function CodedButton() {
       console.error(e);
     }
   };
+
+  const navigateTo = (index) =>
+    setFolderStack((prev) => (index < 0 ? [] : prev.slice(0, index + 1)));
 
   if (isLoading)
     return (
@@ -289,7 +298,7 @@ export default function CodedButton() {
         </button>
         {folderStack.map((folder, i) => (
           <span key={folder._id} className="flex items-center gap-1">
-            <FiChevronRight size={14} className="text-gray-400" />
+            <span className="text-gray-400">›</span>
             <button
               onClick={() => navigateTo(i)}
               className={`font-medium transition ${
@@ -306,7 +315,7 @@ export default function CodedButton() {
         Your encoded and protected contents. Click any item to decode
       </p>
       <div className="flex items-center justify-end mb-5">
-        {files.length > 0 && (
+        {allFiles.length > 0 && (
           <div className="flex items-center bg-gray-100 rounded-xl p-1 gap-1">
             <button
               onClick={() => setViewMode("grid")}
@@ -326,10 +335,12 @@ export default function CodedButton() {
         <div className="flex flex-col items-center justify-center h-64">
           <FiShield size={48} className="text-gray-300 mb-4" />
           <p className="text-gray-500 text-lg font-medium">
-            No encoded contents
+            {searchQuery ? "No matches found" : "No encoded contents"}
           </p>
           <p className="text-gray-400 text-sm mt-1">
-            Encoded files and messages will appear here
+            {searchQuery
+              ? `Nothing matches "${searchQuery}"`
+              : "Encoded files and messages will appear here"}
           </p>
         </div>
       )}
@@ -442,6 +453,7 @@ export default function CodedButton() {
           </div>
         </div>
       )}
+
       <Open
         isOpen={showOpen}
         onClose={() => setShowOpen(false)}

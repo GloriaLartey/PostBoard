@@ -8,7 +8,7 @@ export default function Signup() {
       onClick={() => navigate("/signup")}
       className="
         cursor-pointer
-        p-[3px]
+        p-[2px]
         bg-gradient-to-r
         from-blue-600
         via-pink-500
@@ -16,6 +16,7 @@ export default function Signup() {
         transition-all
         duration-300
         hover:rounded-full
+        hover:scale-105
       "
     >
       <div
@@ -23,8 +24,9 @@ export default function Signup() {
           bg-black
           text-white
           text-center
-          px-3
-          py-2
+          px-3 sm:px-4 md:px-5
+          py-1.5 sm:py-2
+          text-sm sm:text-base
           font-semibold
           transition-all
           duration-300
