@@ -1,7 +1,5 @@
 const { body } = require("express-validator");
 
-const DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || "@";
-
 // ── Signup ────────────────────────────────────────────────────────────────────
 const signupValidation = [
   body("username")
@@ -15,19 +13,13 @@ const signupValidation = [
       "Username can only contain letters, numbers, underscores, hyphens and dots",
     ),
 
+  // Any valid email format is accepted — no domain restriction.
   body("email")
     .trim()
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("Please provide a valid email address")
-    .custom((value) => {
-      const domain = value.split("@")[1];
-      if (domain !== DOMAIN) {
-        throw new Error(`Only @${DOMAIN} email addresses are allowed`);
-      }
-      return true;
-    })
+    .withMessage("Please provide a valid email address (e.g. name@example.com)")
     .normalizeEmail({ gmail_remove_dots: false }),
 
   body("password")
@@ -93,14 +85,7 @@ const forgotPasswordValidation = [
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("Please provide a valid email address")
-    .custom((value) => {
-      const domain = value.split("@")[1];
-      if (domain !== DOMAIN) {
-        throw new Error(`Only @${DOMAIN} email addresses are supported`);
-      }
-      return true;
-    })
+    .withMessage("Please provide a valid email address (e.g. name@example.com)")
     .normalizeEmail({ gmail_remove_dots: false }),
 ];
 
