@@ -5,7 +5,7 @@ const api = axios.create({
     import.meta.env.VITE_API_URL ||
     (import.meta.env.DEV
       ? "http://localhost:5000"
-      : "https://gpostboard.adroit360.com/"),
+      : "https://gpostboard.adroit360.com"),
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -78,7 +78,7 @@ api.interceptors.response.use(
           import.meta.env.VITE_API_URL ||
           (import.meta.env.DEV
             ? "http://localhost:5000"
-            : "https://gpostboard.adroit360.com/");
+            : "https://gpostboard.adroit360.com");
 
         const { data } = await axios.post(
           `${API_BASE_URL}/api/auth/refresh-token`,
