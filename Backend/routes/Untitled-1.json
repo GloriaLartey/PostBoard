@@ -1,0 +1,36 @@
+{
+  "error": {
+    "message": "Network Error",
+    "name": "AxiosError",
+    "stack": "AxiosError: Network Error\n    at XMLHttpRequest.handleError (http://localhost:5173/node_modules/.vite/deps/axios.js?v=d8c02a1b:2132:16)",
+    "config": {
+      "transitional": {
+        "silentJSONParsing": true,
+        "forcedJSONParsing": true,
+        "clarifyTimeoutError": false,
+        "legacyInterceptorReqResOrdering": true,
+        "advertiseZstdAcceptEncoding": false
+      },
+      "adapter": ["xhr", "http", "fetch"],
+      "transformRequest": [null],
+      "transformResponse": [null],
+      "timeout": 0,
+      "xsrfCookieName": "XSRF-TOKEN",
+      "xsrfHeaderName": "X-XSRF-TOKEN",
+      "maxContentLength": -1,
+      "maxBodyLength": -1,
+      "env": {},
+      "headers": {
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      },
+      "baseURL": "http://localhost:5000",
+      "withCredentials": true,
+      "method": "post",
+      "url": "api/auth/login",
+      "data": "{\"identifier\":\"glorialartey15@gmail.com\",\"password\":\"Sunday715#\"}",
+      "allowAbsoluteUrls": true
+    },
+    "code": "ERR_NETWORK"
+  }
+}

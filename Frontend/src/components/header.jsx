@@ -1,28 +1,37 @@
 import Logo from "./logo";
 import SearchBar from "./searchBar";
 import RightBarActions from "./rightBarActions.jsx";
+import { HamburgerButton } from "./sidebar.jsx";
 
-export default function Header({ searchQuery, onSearchChange }) {
+export default function Header({ searchQuery, onSearchChange, mobileMenuOpen, setMobileMenuOpen }) {
   return (
-    <header className="w-full h-24 bg-white border-none shadow-sm px-8 flex items-center">
-      <div className="w-full flex items-center justify-between gap-8">
+    <header className="w-full bg-white shadow-sm z-30 relative">
 
-        {/* LEFT - LOGO */}
-        <div className="shrink-0">
+      {/* ── ROW 1: Hamburger · Logo · Actions ──────────────── */}
+      <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 h-14 md:h-16 gap-3">
+
+        {/* LEFT: hamburger (mobile only) + logo */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <HamburgerButton onClick={() => setMobileMenuOpen((p) => !p)} />
           <Logo />
         </div>
 
-        {/* MIDDLE - SEARCH BAR */}
-        <div className="flex-1 flex justify-center">
+        {/* MIDDLE: search bar — hidden on small, visible md+ inline */}
+        <div className="hidden md:flex flex-1 justify-center max-w-xl mx-4">
           <SearchBar value={searchQuery} onQueryChange={onSearchChange} />
         </div>
 
-        {/* RIGHT - ACTIONS */}
-        <div className="shrink-0">
+        {/* RIGHT: actions */}
+        <div className="flex-shrink-0">
           <RightBarActions />
         </div>
-
       </div>
+
+      {/* ── ROW 2: Search bar on mobile only ───────────────── */}
+      <div className="md:hidden px-4 pb-3">
+        <SearchBar value={searchQuery} onQueryChange={onSearchChange} />
+      </div>
+
     </header>
   );
 }

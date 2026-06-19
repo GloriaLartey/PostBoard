@@ -11,7 +11,8 @@ import TrashButton from "../components/trashButton.jsx";
 
 export default function Home() {
   const [activePage, setActivePage] = useState("myfiles");
-  const [viewMode, setViewMode]     = useState("grid");
+  const [viewMode, setViewMode] = useState("grid");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Single search query, lifted here, fed by Header's SearchBar,
   // consumed by whichever section is currently active.
@@ -24,7 +25,9 @@ export default function Home() {
       case "home":
         return <HomeButton viewMode={viewMode} searchQuery={searchQuery} />;
       case "shared":
-        return <SharedWithMeButton viewMode={viewMode} searchQuery={searchQuery} />;
+        return (
+          <SharedWithMeButton viewMode={viewMode} searchQuery={searchQuery} />
+        );
       case "coded":
         return <CodedButton viewMode={viewMode} searchQuery={searchQuery} />;
       case "drafts":
@@ -40,19 +43,29 @@ export default function Home() {
     <div className="h-screen bg-gray-100 overflow-hidden">
       {/* FIXED HEADER */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Header
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          mobileMenuOpen={mobileMenuOpen} // ← ADD
+          setMobileMenuOpen={setMobileMenuOpen}
+        />
       </div>
 
       {/* MAIN LAYOUT */}
-      <div className="flex h-[calc(100vh-96px)] pt-24">
+      <div className="flex h-[calc(100vh-100px)] pt-24 lg:pt-16">
         {/* SIDEBAR */}
         <Sidebar
           activePage={activePage}
-          setActivePage={(page) => { setActivePage(page); setSearchQuery(""); }}
+          setActivePage={(page) => {
+            setActivePage(page);
+            setSearchQuery("");
+          }}
+          mobileMenuOpen={mobileMenuOpen} // ← ADD
+          setMobileMenuOpen={setMobileMenuOpen}
         />
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 overflow-y-auto h-full">
+        <main className="flex-1 overflow-y-auto h-[calc(100vh-96px)]">
           <div className="p-8">{renderContent()}</div>
         </main>
       </div>

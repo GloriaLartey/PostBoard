@@ -225,7 +225,7 @@ export default function SharedWithMeButton({ searchQuery = "" }) {
 
   return (
     <div>
-      <nav className="flex items-center gap-1 text-sm px-6 pt-6 flex-wrap">
+      <nav className="flex items-center gap-1 text-sm  flex-wrap">
         <button
           onClick={() => navigateTo(-1)}
           className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-medium transition">
@@ -246,7 +246,7 @@ export default function SharedWithMeButton({ searchQuery = "" }) {
           </span>
         ))}
       </nav>
-      <p className="flex items-center gap-1.5 text-gray-500 text-decoration-italic px-6">
+      <p className="flex items-center gap-1.5 text-gray-500 italic">
         All contents that have been shared with you
       </p>
       <div className="flex items-center justify-between mb-5">
