@@ -1,7 +1,7 @@
 import Logo from "./logo";
 import SearchBar from "./searchBar";
 import RightBarActions from "./rightBarActions.jsx";
-import { HamburgerButton } from "./sidebar.jsx";
+import { HamburgerButton } from "./sideBar.jsx";
 
 export default function Header({ searchQuery, onSearchChange, mobileMenuOpen, setMobileMenuOpen }) {
   return (
